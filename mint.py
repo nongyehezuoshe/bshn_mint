@@ -35,8 +35,8 @@ maindata={
 
 def get_maindata():
 	def get_number():
-		# text=str(random.randint(1,100000))
-		text="8"
+		text=str(random.randint(1,100000))
+		# text="8"
 		if sql_check_num(text):
 			tool_print(sys._getframe().f_lineno,"Number: "+text)
 			return text
