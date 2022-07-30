@@ -1,1 +1,1 @@
-# bshn_mint
+# bshn
