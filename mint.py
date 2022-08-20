@@ -6,13 +6,13 @@ from PIL import Image,ImageFilter,ImageDraw,ImageFont
 maindata={
 	"meta_name":"BSH Number",
 	"meta_collection_name":"BSH Number Series NFTs",
-	"meta_collection_id":"3a6a97e4-7ee2-4e83-bdd2-bcd2f0d7ddb9",
-	"git_repo":"nongyehezuoshe/bshn",
-	"f":"1730953628",
-	"i":"3",
-	"ra":"xch17rxqgvq3ffpmfctt8x8etspu8z36v6807du9uhcgp7e75h9fev7qsf4xrd",
-	"ta":"xch1rd70g60z4evue390h9chjdsq9f6uqx79h397pf5l3h63r9twwf9q5lf0d9",
-	"nft-key":"",# get from nft.storage
+	"meta_collection_id":"", # NFT collection ID
+	"git_repo":"nongyehezuoshe/bshn", 
+	"f":"", # 
+	"i":"", #
+	"ra":"", #
+	"ta":"", #
+	"nft-key":"", #
 	"number":"",
 	"material":"",
 	"style":"",
@@ -33,10 +33,21 @@ maindata={
 	"backgroundcolor":"NONE"
 }
 
+def get_id():
+	conn = sqlite3.connect('bshn.db')
+	cur = conn.cursor()
+	cur.execute("SELECT * FROM bshn") 
+	_get=cur.fetchall()
+	conn.commit()
+	cur.close()
+	conn.close()
+
+	tool_print(sys._getframe().f_lineno,"ID: "+str(len(_get)+1))
+	return len(_get)+1
+
 def get_maindata():
 	def get_number():
 		text=str(random.randint(1,100000))
-		# text="8"
 		if sql_check_num(text):
 			tool_print(sys._getframe().f_lineno,"Number: "+text)
 			return text
@@ -92,17 +103,17 @@ def get_maindata():
 		tool_print(sys._getframe().f_lineno,_dir)
 		return (_dir)
 
-	def get_id():
-		conn = sqlite3.connect('bshn.db')
-		cur = conn.cursor()
-		cur.execute("SELECT * FROM bshn") 
-		_get=cur.fetchall()
-		conn.commit()
-		cur.close()
-		conn.close()
+	# def get_id():
+	# 	conn = sqlite3.connect('bshn.db')
+	# 	cur = conn.cursor()
+	# 	cur.execute("SELECT * FROM bshn") 
+	# 	_get=cur.fetchall()
+	# 	conn.commit()
+	# 	cur.close()
+	# 	conn.close()
 
-		tool_print(sys._getframe().f_lineno,"ID: "+str(len(_get)+1))
-		return len(_get)+1
+	# 	tool_print(sys._getframe().f_lineno,"ID: "+str(len(_get)+1))
+	# 	return len(_get)+1
 
 	maindata["number"]=get_number()
 	maindata["material"]=get_material()
@@ -182,7 +193,6 @@ def sql_check_num(text):
 		return True
 
 def sql_write():
-	tool_print(sys._getframe().f_lineno,maindata["current_addr"])
 	conn = sqlite3.connect('bshn.db')
 	cur = conn.cursor()
 	cur.execute("""INSERT INTO bshn VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);""",(maindata['id'],maindata['number'],str(maindata['style']),str(maindata['color']),str(maindata['time']),maindata['words'],maindata['material'],maindata['hash'],maindata['hashmeta'],maindata['nftid'][0],maindata['nftaddr'],maindata["local"],maindata["nftcid"],maindata["metacid"],str(maindata["backgroundcolor"])))
@@ -196,7 +206,7 @@ def sql_write():
 	cur.close()
 	conn.close()
 
-	_catch=['888', '8888', '88888', '666', '6666', '66666', '12345', '54321', '100', '1000', '10000', '100000']
+	_catch=['888', '8888', '88888', '666', '6666', '66666', '12345', '54321', '100', '1000', '10000', '100000','1','65535']
 	if int(maindata["number"])<100 or int(maindata["number"]) in _catch:
 		with open("numcatch","a") as f:
 			f.writelines("\nnumber:"+str(maindata["number"])+" nftid:"+str(maindata["nftid"][0]+" nftaddr:"+str(maindata["nftaddr"])))
@@ -386,21 +396,60 @@ def nft():
 	# return
 
 	nft_storage()
+	time.sleep(5)
 	meta_storage()
 
 def nft_storage():
 	url="https://api.nft.storage/upload/"
 	files={'file':("nft/"+maindata["local"]+"/"+maindata["hash"]+".png",open("nft/"+maindata["local"]+"/"+maindata["hash"]+".png",'rb'),"image/png")}
 	headers = {'accept': 'application/json', 'Authorization': 'Bearer '+maindata["nft-key"]}
-	r = requests.post(url, files=files, headers=headers)
-	maindata["nftcid"]=r.json()["value"]["cid"]
+
+	tool_print(sys._getframe().f_lineno,"nft_storage")
+	_flag=1
+	while True:
+		try:
+			tool_print(sys._getframe().f_lineno,_flag)
+			r = requests.post(url, files=files, headers=headers)
+			if r.status_code==200:
+				maindata["nftcid"]=r.json()["value"]["cid"]
+				break
+			else:
+				tool_print(sys._getframe().f_lineno,r.status_code)
+				_flag=_flag+1
+				time.sleep(5)
+				continue
+		except Exception as e:
+			tool_print(sys._getframe().f_lineno,str(e))
+			time.sleep(30)
+			continue
+
+
+
 
 def meta_storage():
 	url="https://api.nft.storage/upload/"
 	files={'file':("meta/"+maindata["local"]+"/"+maindata["hashmeta"]+".json",open("meta/"+maindata["local"]+"/"+maindata["hashmeta"]+".json",'rb'),"application/json")}
 	headers = {'accept': 'application/json', 'Authorization': 'Bearer '+maindata["nft-key"]}
-	r = requests.post(url, files=files, headers=headers)
-	maindata["metacid"]=r.json()["value"]["cid"]
+
+	tool_print(sys._getframe().f_lineno,"meta_storage")
+	_flag=1
+	while True:
+		try:
+			tool_print(sys._getframe().f_lineno,_flag)
+			r = requests.post(url, files=files, headers=headers)
+			if r.status_code==200:
+				maindata["metacid"]=r.json()["value"]["cid"]
+				break
+			else:
+				tool_print(sys._getframe().f_lineno,r.status_code)
+				_flag=_flag+1
+				time.sleep(5)
+		except Exception as e:
+			tool_print(sys._getframe().f_lineno,str(e))
+			time.sleep(30)
+			continue
+
+
 
 
 def get_nft_amount():
@@ -427,7 +476,7 @@ def get_nft_addr():
 	cur.close()
 	conn.close()
 
-	tool_print(sys._getframe().f_lineno,_get)
+	# tool_print(sys._getframe().f_lineno,_get)
 	_id=random.randint(0,len(_get)-1)
 	return _get[_id]
 
@@ -463,25 +512,25 @@ def mint_new_nft(current_addr):
 
 
 def mint_git():
-	# _sub_add=subprocess.run(['git', 'add', 'meta', 'nft'])
-	# _sub_commit=subprocess.run(['git', 'commit', '-am', 'mint_upload'])
-	# _sub_push=subprocess.run(['git', 'push'])
+	_sub_add=subprocess.run(['git', 'add', 'meta', 'nft'])
+	_sub_commit=subprocess.run(['git', 'commit', '-am', 'mint_upload'])
+	_sub_push=subprocess.run(['git', 'push'])
 
-	while True:
-		_sub_add=subprocess.run(['git', 'add', 'meta', 'nft'],capture_output=True,text=True)
-		print(_sub_add.stdout.split("\n"))
-		if _sub_add.returncode==0:
-			_sub_commit=subprocess.run(['git', 'commit', '-am', 'mint_upload'],capture_output=True,text=True)
-			print(_sub_commit.stdout.split("\n"))
-			if _sub_commit.returncode==0:
-				_sub_push=subprocess.run(['git', 'push'],capture_output=True,text=True)
-				print(_sub_push.stdout.split("\n"))
-				if _sub_push.returncode==0:
-					tool_print(sys._getframe().f_lineno,"git push done")
-					return
-				time.sleep(5)
-			time.sleep(5)
-		time.sleep(5)
+	# while True:
+	# 	_sub_add=subprocess.run(['git', 'add', 'meta', 'nft'],capture_output=True,text=True)
+	# 	print(_sub_add.stdout.split("\n"))
+	# 	if _sub_add.returncode==0:
+	# 		_sub_commit=subprocess.run(['git', 'commit', '-am', 'mint_upload'],capture_output=True,text=True)
+	# 		print(_sub_commit.stdout.split("\n"))
+	# 		if _sub_commit.returncode==0:
+	# 			_sub_push=subprocess.run(['git', 'push'],capture_output=True,text=True)
+	# 			print(_sub_push.stdout.split("\n"))
+	# 			if _sub_push.returncode==0:
+	# 				tool_print(sys._getframe().f_lineno,"git push done")
+	# 				return
+	# 			time.sleep(5)
+	# 		time.sleep(5)
+	# 	time.sleep(5)
 
 
 def mint_trans():
@@ -532,6 +581,14 @@ def mint_done():
 
 def mint_nft(mint_amount):
 	tool_print(sys._getframe().f_lineno,"start mint, total: "+str(mint_amount))
+	while True:
+		_current_nft=mint_get_current()
+		if _current_nft[0]=="NONE" and _current_nft[1]=="NONE" :
+			break
+		else:
+			tool_print(sys._getframe().f_lineno,"NFT existed")
+		time.sleep(5)
+
 	while mint_amount>0:
 		tool_print(sys._getframe().f_lineno,"START")
 		get_maindata()
