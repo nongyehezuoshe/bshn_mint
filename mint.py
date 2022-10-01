@@ -55,7 +55,7 @@ def tool_print(line,text):
 
 def get_nft_latest():
 	while True:
-		_sub=subprocess.run(['chia', 'wallet', 'nft', 'list', '-f', '708222379', '-i', '3'],capture_output=True,text=True)
+		_sub=subprocess.run(['chia', 'wallet', 'nft', 'list', '-f', maindata["f"], '-i', maindata["i"]],capture_output=True,text=True)
 		_value=["",""]
 		if _sub.returncode==0 :
 			_out=_sub.stdout.split("\n")
@@ -613,7 +613,7 @@ def set_nft_mint():
 
 	def mint_trans():
 		while True:
-			_sub=subprocess.run(['chia', 'wallet', 'nft', 'transfer', '-f', '708222379', '-i', '3', '-ni',maindata["nftid"][1],"-ta",maindata["current_addr"][0]],capture_output=True,text=True)
+			_sub=subprocess.run(['chia', 'wallet', 'nft', 'transfer', '-f', maindata["f"], '-i', maindata["i"], '-ni',maindata["nftid"][1],"-ta",maindata["current_addr"][0]],capture_output=True,text=True)
 			# tool_print(sys._getframe().f_lineno,_sub.returncode)
 			if _sub.returncode==0:
 				_out=_sub.stdout.split("\n")
