@@ -4,15 +4,16 @@ from PIL import Image,ImageFilter,ImageDraw,ImageFont
 requests.packages.urllib3.disable_warnings()
 
 maindata={
-	"meta_name":"",
-	"meta_collection_name":"",
-	"meta_collection_id":"",
-	"git_repo":"nongyehezuoshe/bshn", # github for storage image
-	"f":"", # chia key Fingerprint
-	"i":"", # chia wallet id
-	"ra":"", # royalty address / any xch address
-	"ta":"xch1l63jc638ln892za2ur6ml3p7n0ez6llt45mjuuxyz24zz8erphnqs8l4m2", # target address for receive minted nft / xch address from current Fingerprint
-	"nft-key":"", # api key from nft.storage
+	"meta_name":"BSH Number",
+	"meta_collection_name":"BSH Number Series NFTs",
+	"meta_collection_id":"d8592369-745e-49a5-8c61-324416bcbaa6",
+	"git_repo":"nongyehezuoshe/bshn", 
+	"f":"1730953628",
+	"i":"3",
+	"ra":"",
+	"ta":"",
+	"nft-key":"",
+
 	"number":"",
 	"material":"",
 	"style":"",
@@ -37,16 +38,16 @@ bsh_trans_options={
 	"defaultstart":0,
 	"start":"",
 	"wallet_id":"5",
-	"to_address":"", # bsh send to
+	"to_address":"",
 	"headers":{'Content-Type': 'application/json','Accept': 'application/json'},
 	"cert":('/root/.chia/mainnet/config/ssl/wallet/private_wallet.crt', '/root/.chia/mainnet/config/ssl/wallet/private_wallet.key'),
 	"data":[],
 	"xch":[],
-	"sellprice":1 # nft price, xx BSH/BSHN, 10000 BSH/BSHN
+	"sellprice":10000
 }
 
 nft_trans_options={
-	"ta":"" # xch address to receive some wrong nfts.
+	"ta":""
 }
 
 def tool_print(line,text):
@@ -314,6 +315,11 @@ def set_nft_img():
 
 	def img_set_num(loadedimg):
 		def text_border(draw,text, x, y, font, shadowcolor, fillcolor):
+			_fillcolor={
+				"Gold":(214,170,83,255),
+				"Silver":(173,175,187,255),
+				"Copper":(245,235,208,255)
+			}
 			draw.text((x - 1, y), text, font=font, fill=shadowcolor)
 			draw.text((x + 1, y), text, font=font, fill=shadowcolor)
 			draw.text((x, y - 1), text, font=font, fill=shadowcolor)
@@ -322,7 +328,7 @@ def set_nft_img():
 			draw.text((x + 1, y - 1), text, font=font, fill=shadowcolor)
 			draw.text((x - 1, y + 1), text, font=font, fill=shadowcolor)
 			draw.text((x + 1, y + 1), text, font=font, fill=shadowcolor)
-			draw.text((x, y), text, font=font, fill=fillcolor)
+			draw.text((x, y), text, font=font, fill=_fillcolor[maindata["material"]])
 
 		def num_check(text):
 			conn = sqlite3.connect('bshn.db')
@@ -359,7 +365,7 @@ def set_nft_img():
 			_len=_len+1
 		draw = ImageDraw.Draw(img)
 		font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 224)
-		text_border(draw,"No."+_text,1725+100, 3600+50+25,font,(255,255,255,128),(random.randint(0,255),random.randint(0,255),random.randint(0,255),255))
+		text_border(draw,"No."+_text,1725+100, 3600+50+25,font,(255,255,255,255),(random.randint(0,255),random.randint(0,255),random.randint(0,255),255))
 		return img
 
 	def img_set_text():
