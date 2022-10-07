@@ -272,7 +272,7 @@ def set_nft_img():
 			_color=[]
 			_pos=[(2259,1324),(1981,1237),(2535,1219),(2089,2024),(2066,2109),(1895,2217),(1978,2240),(2177,2128),(2031,2286),(2427,2925),(2474,3060),(2490,3283),(1895,3347),(1997,3361),(2165,3311),(2382,3585),(2267,3422),(2344,3471),(1762,3334),(1220,3589),(1442,3577),(1516,3667),(1581,3758),(1787,3798),(2001,3833),(3301,3511),(3166,3201),(2616,2307)]
 			for p in range(0,len(_pos),1):
-				_the_color=loadedimg[_pos[p][0],_pos[p][1]]
+				_the_color=loadedimg[int(_pos[p][0]/4.45),int(_pos[p][1]/4.45)]
 				if _the_color not in _color:
 					_color.append(_the_color)
 			return _color
@@ -290,7 +290,8 @@ def set_nft_img():
 		tool_print(str(sys._getframe().f_lineno)+" "+"Color",str(_color))
 		for x in range(loadedimg.size[0]):
 			for y in range(loadedimg.size[1]):
-				if math.sqrt(pow((abs(x)-2427),2)+pow((abs(y)-2427-300),2))>2427-16-800:
+				# if math.sqrt(pow(abs(x)-2427,2)+pow(abs(y)-2427-300,2))>2427-16-800:
+				if math.sqrt(pow(abs(x)-540,2)+pow(abs(y)-540-65,2))>524-165:
 					_pix_img[x, y] = (0, 0, 0, 0)
 					continue
 				for z in range(0,len(_color_picked),1):
@@ -302,12 +303,13 @@ def set_nft_img():
 	def img_set_bg(loadedimg):
 		img_set_material()
 		_bg=Image.open("base_img/bg_"+maindata["material"].lower()+".png").convert('RGBA')
-		_bg.paste(loadedimg,(0,-300),loadedimg)
+		# _bg.paste(loadedimg,(0,-300),loadedimg)
+		_bg.paste(loadedimg,(0,-65),loadedimg)
 		return _bg
 
 	def img_set_bgcolor(loadedimg):
 		_color=(random.randint(0,255),random.randint(0,255),random.randint(0,255),32)
-		_img_bg=Image.new(mode='RGBA', size=(4854, 4854), color=_color)
+		_img_bg=Image.new(mode='RGBA', size=(1080, 1080), color=_color)
 		_img_bg.paste(img,(0,0),img)
 		maindata["backgroundcolor"]=_color
 		tool_print(str(sys._getframe().f_lineno)+" "+"BackgroundColor",str(_color))
@@ -320,14 +322,14 @@ def set_nft_img():
 				"Silver":(173,175,187,255),
 				"Copper":(245,235,208,255)
 			}
-			draw.text((x - 1, y), text, font=font, fill=shadowcolor)
-			draw.text((x + 1, y), text, font=font, fill=shadowcolor)
-			draw.text((x, y - 1), text, font=font, fill=shadowcolor)
-			draw.text((x, y + 1), text, font=font, fill=shadowcolor)
-			draw.text((x - 1, y - 1), text, font=font, fill=shadowcolor)
-			draw.text((x + 1, y - 1), text, font=font, fill=shadowcolor)
-			draw.text((x - 1, y + 1), text, font=font, fill=shadowcolor)
-			draw.text((x + 1, y + 1), text, font=font, fill=shadowcolor)
+			# draw.text((x - 1, y), text, font=font, fill=shadowcolor)
+			# draw.text((x + 1, y), text, font=font, fill=shadowcolor)
+			# draw.text((x, y - 1), text, font=font, fill=shadowcolor)
+			# draw.text((x, y + 1), text, font=font, fill=shadowcolor)
+			# draw.text((x - 1, y - 1), text, font=font, fill=shadowcolor)
+			# draw.text((x + 1, y - 1), text, font=font, fill=shadowcolor)
+			# draw.text((x - 1, y + 1), text, font=font, fill=shadowcolor)
+			# draw.text((x + 1, y + 1), text, font=font, fill=shadowcolor)
 			draw.text((x, y), text, font=font, fill=_fillcolor[maindata["material"]])
 
 		def num_check(text):
@@ -364,8 +366,43 @@ def set_nft_img():
 			_text="0"+_text
 			_len=_len+1
 		draw = ImageDraw.Draw(img)
-		font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 224)
-		text_border(draw,"No."+_text,1725+100, 3600+50+25,font,(255,255,255,255),(random.randint(0,255),random.randint(0,255),random.randint(0,255),255))
+		font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 45)
+		# text_border(draw,"No."+_text,1725+100, 3600+50+25,font,(255,255,255,255),(random.randint(0,255),random.randint(0,255),random.randint(0,255),255))
+		text_border(draw,"No."+_text,420, 820,font,(255,255,255,255),(random.randint(0,255),random.randint(0,255),random.randint(0,255),255))
+		return img
+
+	def img_resize(loadedimg):
+		tool_print(str(sys._getframe().f_lineno)+" "+"resizing","...")
+		def change_block(x, y, black_size, img_array):
+			color_dist = {}
+			block_pos_list = []
+			for pos_x in range(-black_size + 1, 1):
+				for pos_y in range(-black_size + 1, 1):
+					block_pos_list.append([x + pos_x, y + pos_y])
+			for pixel in block_pos_list:
+				if not str(img_array[pixel[0], pixel[1]]) in color_dist.keys():
+					color_dist[str(img_array[pixel[0], pixel[1]])] = 1
+				else:
+					color_dist[str(img_array[pixel[0], pixel[1]])] += 1
+			new_dict = {v: k for k, v in color_dist.items()}
+			max_color = new_dict[max(color_dist.values())]
+			for a in block_pos_list:
+				img_array[a[0], a[1]] = tuple(list(map(int, max_color[1:len(max_color) - 1].split(","))))
+		block_size = 2
+		img=loadedimg
+		width, height = img.size
+		img_array = img.load()
+		max_width = width + block_size
+		max_height = height + block_size
+		for x in range(block_size - 1, max_width, block_size):
+			for y in range(block_size - 1, max_height, block_size):
+				if x == max_width - max_width % block_size - 1:
+					x = width - 1
+				if y == max_height - max_height % block_size - 1:
+					y = height - 1
+				change_block(x, y, block_size, img_array)
+				y += block_size
+			x += block_size
 		return img
 
 	def img_set_text():
@@ -427,6 +464,7 @@ def set_nft_img():
 
 	img=img_load()
 	img=img_set_randcolor(img)
+	# img=img_resize(img)
 	img=img_set_bg(img)
 	img=img_set_num(img)
 	img=img_set_bgcolor(img)
@@ -586,9 +624,11 @@ def set_nft_mint():
 		_nh=maindata["hash"]
 		_mu="https://"+maindata["metacid"]+".ipfs.nftstorage.link/"+"meta/"+maindata["local"]+"/"+maindata["hashmeta"]+".json"+","+"https://github.com/"+maindata["git_repo"]+"/raw/main/meta/"+maindata["local"]+"/"+maindata["hashmeta"]+".json"
 		_mh=maindata["hashmeta"]
+		_lu="https://creativecommons.org/licenses/by/4.0/legalcode.txt"
+		_lh="9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
 
 		while True:
-			_mint=subprocess.run(['chia', 'wallet', 'nft', 'mint', '-f', _f, '-i', _i, '-ra', _ra, '-ta', _ta, '-u', _u, '-nh', _nh, '-mu', _mu, '-mh', _mh, '-rp', '1', '-m', '0'],capture_output=True,text=True)
+			_mint=subprocess.run(['chia', 'wallet', 'nft', 'mint', '-f', _f, '-i', _i, '-ra', _ra, '-ta', _ta, '-u', _u, '-nh', _nh, '-mu', _mu, '-mh', _mh, '-lu', _lu, '-lh', _lh, '-rp', '1', '-m', '0'],capture_output=True,text=True)
 			# print(_mint.stdout.split("\n"))
 			if _mint.returncode==0:
 				_out=_mint.stdout.split("\n")
