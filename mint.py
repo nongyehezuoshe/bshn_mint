@@ -10,6 +10,7 @@ maindata={
 	"git_repo":"nongyehezuoshe/bshn", 
 	"f":"1730953628",
 	"i":"3",
+	"m":"0", # Set the fees per transaction, in XCH.
 	"ra":"",
 	"ta":"",
 	"nft-key":"",
@@ -203,7 +204,7 @@ def trans_allnfts():
 	def nft_trans(id):
 		while True:
 			tool_print(sys._getframe().f_lineno,"transfer begain")
-			_sub=subprocess.run(['chia', 'wallet', 'nft', 'transfer', '-f', maindata["f"], '-i', maindata["i"], '-ni',id[1],"-ta",nft_trans_options["ta"]],capture_output=True,text=True)
+			_sub=subprocess.run(['chia', 'wallet', 'nft', 'transfer', '-m', maindata["m"], '-f', maindata["f"], '-i', maindata["i"], '-ni',id[1],"-ta",nft_trans_options["ta"]],capture_output=True,text=True)
 			if _sub.returncode==0:
 				_out=_sub.stdout.split("\n")
 				for i in range(0,len(_out)):
@@ -628,7 +629,7 @@ def set_nft_mint():
 		_lh="9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411"
 
 		while True:
-			_mint=subprocess.run(['chia', 'wallet', 'nft', 'mint', '-f', _f, '-i', _i, '-ra', _ra, '-ta', _ta, '-u', _u, '-nh', _nh, '-mu', _mu, '-mh', _mh, '-lu', _lu, '-lh', _lh, '-rp', '1', '-m', '0'],capture_output=True,text=True)
+			_mint=subprocess.run(['chia', 'wallet', 'nft', 'mint', '-m', str(float(maindata["m"])*2), '-f', _f, '-i', _i, '-ra', _ra, '-ta', _ta, '-u', _u, '-nh', _nh, '-mu', _mu, '-mh', _mh, '-lu', _lu, '-lh', _lh, '-rp', '1', '-m', '0'],capture_output=True,text=True)
 			# print(_mint.stdout.split("\n"))
 			if _mint.returncode==0:
 				_out=_mint.stdout.split("\n")
@@ -653,7 +654,7 @@ def set_nft_mint():
 
 	def mint_trans():
 		while True:
-			_sub=subprocess.run(['chia', 'wallet', 'nft', 'transfer', '-f', maindata["f"], '-i', maindata["i"], '-ni',maindata["nftid"][1],"-ta",maindata["current_addr"][0]],capture_output=True,text=True)
+			_sub=subprocess.run(['chia', 'wallet', 'nft', 'transfer', '-m', maindata["m"], '-f', maindata["f"], '-i', maindata["i"], '-ni',maindata["nftid"][1],"-ta",maindata["current_addr"][0]],capture_output=True,text=True)
 			# tool_print(sys._getframe().f_lineno,_sub.returncode)
 			if _sub.returncode==0:
 				_out=_sub.stdout.split("\n")
